@@ -1,6 +1,7 @@
 import { useHttp } from '../../hooks/http.hook';
 import { useEffect, useCallback } from 'react';
 import { useDispatch, useSelector, shallowEqual } from 'react-redux';
+import { createSelector } from 'reselect';
 
 import {
     heroesFetching,
@@ -11,14 +12,34 @@ import {
 import HeroesListItem from '../heroesListItem/HeroesListItem';
 import Spinner from '../spinner/Spinner';
 
-// Задача для этого компонента:
-// При клике на "крестик" идет удаление персонажа из общего состояния
-// Усложненная задача:
-// Удаление идет и с json файла при помощи метода DELETE
-
 const HeroesList = () => {
-    const { heroesLoadingStatus, filteredHeroes } = useSelector(
-        (state) => state,
+    console.log('heroeslist render');
+
+    const filteredHeroesSelector = createSelector(
+        (state) => state.filters.activeFilter,
+        (state) => state.heroes.heroes,
+        (filter, heroes) => {
+            if (filter === 'all') {
+                return heroes;
+            } else {
+                return heroes.filter((hero) => hero.element === filter);
+            }
+        }
+    );
+
+    // const filteredHeroes = useSelector((state) => {
+    //     if (state.filters.activeFilter === 'all') {
+    //         return state.heroes.heroes;
+    //     } else {
+    //         return state.heroes.heroes.filter(
+    //             (hero) => hero.element === state.filters.activeFilter
+    //         );
+    //     }
+    // }, shallowEqual);
+
+    const filteredHeroes = useSelector(filteredHeroesSelector);
+    const { heroesLoadingStatus } = useSelector(
+        (state) => state.heroes.heroesLoadingStatus,
         shallowEqual
     );
     const dispatch = useDispatch();
@@ -67,8 +88,6 @@ const HeroesList = () => {
             );
         });
     };
-
-    console.log('heroeslist render');
 
     const elements = renderHeroesList(filteredHeroes);
     return <ul>{elements}</ul>;

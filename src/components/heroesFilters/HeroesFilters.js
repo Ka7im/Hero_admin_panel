@@ -19,11 +19,9 @@ import Spinner from '../spinner/Spinner';
 const HeroesFilters = () => {
     const { request } = useHttp();
     const { activeFilter, filters, filtersLoadingStatus } = useSelector(
-        ({ activeFilter, filters, filtersLoadingStatus }) => {
+        ({ filters }) => {
             return {
-                activeFilter,
-                filters,
-                filtersLoadingStatus,
+                ...filters,
             };
         },
         shallowEqual
