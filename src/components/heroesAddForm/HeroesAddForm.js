@@ -1,8 +1,10 @@
 import { useState } from 'react';
 import { v4 as uuidv4 } from 'uuid';
 import { useHttp } from '../../hooks/http.hook';
-import { heroAdded } from '../../actions';
+import { heroAdded } from '../heroesList/heroesSlice';
 import { useDispatch, useSelector, shallowEqual } from 'react-redux';
+import { selectAll } from '../heroesFilters/filtersSlice';
+import store from '../../store';
 
 const HeroesAddForm = () => {
     const [name, setName] = useState('');
@@ -10,13 +12,13 @@ const HeroesAddForm = () => {
     const [element, setElement] = useState('');
     const { request } = useHttp();
     const dispatch = useDispatch();
-    const { filters, filtersLoadingStatus } = useSelector(
-        ({ filters: { filters, filtersLoadingStatus } }) => ({
-            filters,
+    const { filtersLoadingStatus } = useSelector(
+        ({ filters: { filtersLoadingStatus } }) => ({
             filtersLoadingStatus,
         }),
         shallowEqual
     );
+    const filters = selectAll(store.getState());
 
     const onSubmitHandler = (e) => {
         e.preventDefault();

@@ -1,32 +1,19 @@
 import { useEffect } from 'react';
-import { useHttp } from '../../hooks/http.hook';
-import { useDispatch, useSelector, shallowEqual } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import classNames from 'classnames';
-import {
-    activeFilterSelected,
-    filtersFetched,
-    filtersFetchingError,
-    filtersFetching,
-} from '../../actions';
+import { filtersChanged, fetchFilters, selectAll } from './filtersSlice';
 import Spinner from '../spinner/Spinner';
+import store from '../../store';
 
 const HeroesFilters = () => {
-    const { request } = useHttp();
-    const { activeFilter, filters, filtersLoadingStatus } = useSelector(
-        ({ filters }) => {
-            return {
-                ...filters,
-            };
-        },
-        shallowEqual
+    const { filtersLoadingStatus, activeFilter } = useSelector(
+        (state) => state.filters
     );
+    const filters = selectAll(store.getState());
     const dispatch = useDispatch();
 
     useEffect(() => {
-        dispatch(filtersFetching());
-        request('http://localhost:3001/filters')
-            .then((filters) => dispatch(filtersFetched(filters)))
-            .catch(() => dispatch(filtersFetchingError()));
+        dispatch(fetchFilters());
         // eslint-disable-next-line
     }, []);
 
@@ -47,7 +34,7 @@ const HeroesFilters = () => {
                 return (
                     <button
                         className={btnClass}
-                        onClick={() => dispatch(activeFilterSelected(name))}
+                        onClick={() => dispatch(filtersChanged(name))}
                         key={name}
                     >
                         {label}
